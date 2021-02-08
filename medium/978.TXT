@@ -1,0 +1,82 @@
+978. 最长湍流子数组
+当 A 的子数组 A[i], A[i+1], ..., A[j] 满足下列条件时，我们称其为湍流子数组：
+
+若 i <= k < j，当 k 为奇数时， A[k] > A[k+1]，且当 k 为偶数时，A[k] < A[k+1]；
+或 若 i <= k < j，当 k 为偶数时，A[k] > A[k+1] ，且当 k 为奇数时， A[k] < A[k+1]。
+也就是说，如果比较符号在子数组中的每个相邻元素对之间翻转，则该子数组是湍流子数组。
+
+返回 A 的最大湍流子数组的长度。
+
+ 
+
+示例 1：
+
+输入：[9,4,2,10,7,8,8,1,9]
+输出：5
+解释：(A[1] > A[2] < A[3] > A[4] < A[5])
+示例 2：
+
+输入：[4,8,12,16]
+输出：2
+示例 3：
+
+输入：[100]
+输出：1
+ 
+
+提示：
+
+1 <= A.length <= 40000
+0 <= A[i] <= 10^9
+
+方法一：滑动窗口
+设数组 \textit{arr}arr 的长度为 nn，窗口 [\textit{left},\textit{right}](0 \le \textit{left} \le \textit{right} \le n-1)[left,right](0≤left≤right≤n−1) 为当前的窗口，窗口内构成了一个「湍流子数组」。随后，我们要考虑下一个窗口的位置。
+
+根据「湍流子数组」的定义，当 0<\textit{right}<n-10<right<n−1 时：
+
+如果 \textit{arr}[\textit{right}-1] < \textit{arr}[\textit{right}]arr[right−1]<arr[right] 且 \textit{arr}[\textit{right}] > \textit{arr}[\textit{right}+1]arr[right]>arr[right+1]，则 [\textit{left},\textit{right}+1][left,right+1] 也构成「湍流子数组」，因此需要将 \textit{right}right 右移一个单位；
+
+如果 \textit{arr}[\textit{right}-1] > \textit{arr}[\textit{right}]arr[right−1]>arr[right] 且 \textit{arr}[\textit{right}] < \textit{arr}[\textit{right}+1]arr[right]<arr[right+1]，同理，也需要将 \textit{right}right 右移一个单位；
+
+否则，[\textit{right}-1,\textit{right}+1][right−1,right+1] 无法构成「湍流子数组」，当 \textit{left}<\textit{right}left<right 时，[\textit{left},\textit{right}+1][left,right+1] 也无法构成「湍流子数组」，因此需要将 \textit{left}left 移到 \textit{right}right，即令 \textit{left}=\textit{right}left=right。
+
+此外，我们还需要特殊考虑窗口长度为 11 (即 \textit{left}left 和 \textit{right}right 相等的情况)：只要 \textit{arr}[\textit{right}] \ne \textit{arr}[\textit{right}+1]arr[right] 
+
+​	
+ =arr[right+1]，就可以将 \textit{right}right 右移一个单位；否则，\textit{left}left 和 \textit{right}right 都要同时右移。
+
+
+
+class Solution {
+public:
+    int maxTurbulenceSize(vector<int>& arr) {
+        int n = arr.size();
+        if(n == 1){
+            return 1;
+        }
+        int res = 1;
+        int start = 0;
+        int end = 0;
+        while(end < n - 1){
+            if(start == end){
+                if(arr[start] == arr[start + 1]){
+                    start ++;
+                }
+                end ++;
+            }
+            else{
+                if(arr[end + 1] > arr[end]&&arr[end] < arr[end - 1]){
+                    end ++;
+                }
+                else if(arr[end + 1] < arr[end]&&arr[end] > arr[end - 1]){
+                    end ++;
+                }
+                else{
+                    start = end;
+                }
+            }
+            res = max (res, end - start + 1);
+        }
+        return res;
+    }
+};
